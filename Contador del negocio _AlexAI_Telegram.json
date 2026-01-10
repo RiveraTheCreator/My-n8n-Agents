@@ -1,0 +1,920 @@
+{
+  "name": "Contador del negocio _AlexAI_Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=El mensaje del usuario: {{ $json.chat_input }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Eres un Analista Financiero y Motor de Datos (FDP-Engine). Tu objetivo es doble: estructurar gastos con precisión y dar coaching financiero contextual.\n\n### 1. CONTEXTO TEMPORAL\n- Fecha sistema: {{ $now }} (ISO).\n- \"Hoy\" = Fecha actual. \"Ayer\" = -1 día.\n- \"Fecha del ticket\" = \"Fecha cuando la transacción se realizo\"\n\n### 2. LISTAS MAESTRAS (Strict Mapping)\n**A. CUENTAS:**\n- \"Efectivo\", \"Cuenta Matriz\", \"Mercado Pago\", \"Nu Debito\", \"Uala Debito\", \"Uala Credito\", \"BBVA\", \"Stripe\".\n\n**B. CATEGORÍAS > [SUBCATEGORÍAS]:**\n1. VIVIENDA > [Renta, Servicios, Insumos y Limpieza, Mantenimiento y Mejoras]\n2. OCIO Y VIDA DIGITAL > [Suscripciones, Salidas Sociales, Hobbies/Juegos, Viajes]\n3. ALIMENTOS > [Supermercado, Restaurantes/Delivery, Antojos]\n4. NEGOCIO Y PROYECTOS > [Infraestructura, Herramientas/Software, Educación Pro]\n5. TRANSPORTE > [Público, Privado/App, Auto]\n6. SALUD Y PERSONA > [Cuidado Personal, Salud, Deporte]\n7. INGRESOS > [Nómina, Negocio/Freelance, Rendimientos]\n8. TRANSFERENCIA > [Movimiento Interno]\n\n**C. ETIQUETA VALOR:**\n- \"Necesidad\", \"Deseo\", \"Inversión\", \"Deuda\", \"N/A\".\n\n### 3. REGLAS DE NEGOCIO Y \"SMART SPLIT\" (CRÍTICO)\n\n**Regla de Granularidad (Agrupación Inteligente):**\n- **NO** crees una fila por cada ítem individual (ej: no una fila para \"tomate\", otra para \"cebolla\"). Agrúpalos por **Sub-Categoría**.\n- **SÍ** separa ítems si pertenecen a categorías/subcategorías distintas.\n    - *Ejemplo Ticket Walmart:* \"Manzanas, Pan, Cerveza y una Camiseta\".\n    - *Salida:* 3 Filas.\n        1. Alimentos > Supermercado (Manzanas + Pan).\n        2. Alimentos > Antojos (Cerveza).\n        3. Salud y Persona > Cuidado Personal (Camiseta).\n\n**Regla del Mes:** Calcula el mes en español (ej: \"Enero\").\n**Regla Cajero:** \"Retiro\" = Transferencia BBVA -> Efectivo.\n\n### 4. MOTOR DE FEEDBACK PERSONALIZADO (Campo \"feedback_global\")\nAnaliza el **patrón total** del input y genera un consejo único o Tip. NO uses frases genéricas.\n- **Estructura del mensaje:** \"✅ [Concepto] registrado ($MONTO).\\n💡 Tip: [Tu consejo aquí]\"\n\n- **Si detectas Alcohol/Comida Chatarra:** \"Veo gastos en antojos. Recuerda la regla 80/20 para tu salud y bolsillo.\"\n- **Si hay \"Suscripciones\":** \"Otra suscripción detectada. ¿Realmente la usas o es un gasto zombie?\"\n- **Si mezclas Necesidad con Deseo:** \"Bien por el super, pero ojo con esos extras (item_deseo) que inflaron el ticket.\"\n- **Si es Inversión/Educación:** \"Gran inversión en ti mismo. Estos gastos tienen el mejor ROI.\"\n- **Tono:** Directo, breve, estilo \"Mentor Financiero\".\n\n### 5. FORMATO DE SALIDA (JSON OBJECT)\nDevuelve un objeto con dos partes: la lista de registros y el mensaje único.\n\n```json\n{\n  \"registros\": [\n    {\n      \"Fecha\": \"dd/MM/yyyy\",\n      \"Mes\": \"String (SIEMPRE EN MINUSCULAS)\",\n      \"Concepto\": \"String (Resumen de los ítems agrupados)\",\n      \"Monto\": 0.00,\n      \"Tipo Movimiento\": \"Gasto\" | \"Ingreso\" | \"Transferencia\",\n      \"Cuenta Origen\": \"String exacto lista A\",\n      \"Cuenta Destino\": \"String exacto lista A\" (o null),\n      \"Categoria\": \"String exacto lista B\",\n      \"sub_categoria\": \"String exacto lista B\",\n      \"beneficiario\": \"Nombre estandarizado\",\n      \"etiqueta_valor\": \"String exacto lista C\"\n    }\n  ],\n  \"feedback_global\": \"Mensaje único para Telegram con resumen y tip personalizado.\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        0
+      ],
+      "id": "dd439ed9-aa81-4550-a3c2-f2ed0b411819",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1072,
+        240
+      ],
+      "id": "f7a03f66-15da-4ce5-82bf-d26b3aa74aae",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Z9BhK6XhEvNmHcLU",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6571be58-7ae0-4b3a-9c4d-706d062d2428"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "98a252f3-df54-41c8-8d0f-705fee6eec87",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Imagen"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ebf44caf-794d-434c-be9b-88adfc2d34a0",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Otro"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -64,
+        -16
+      ],
+      "id": "5ba0b93a-ce80-49b5-b19b-8819e3bb79e4",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e2644e1-fe2b-4523-b3bc-3db62622315c",
+              "name": "content",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        -192
+      ],
+      "id": "a619e46b-dbd7-42e9-ab8d-cdbbf7d01333",
+      "name": "Audio Content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e2644e1-fe2b-4523-b3bc-3db62622315c",
+              "name": "content",
+              "value": "=<imagen>\n{{ $json.content}}\n</imagen>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        0
+      ],
+      "id": "745cba07-94a6-4195-93f8-71965204bb77",
+      "name": "Audio Content1"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "Describe de forma detallada el ticket , recibo, factura o comprobante como si fueras a registrar cada transaccion. Enfocate en las transacciones financieras articulos, registros y totales,y da la informacion mas importante para registrar la transaccion",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        400,
+        0
+      ],
+      "id": "c026b86e-ee5a-48d9-bbb9-a1a88aca1f36",
+      "name": "Describe imagen",
+      "credentials": {
+        "openAiApi": {
+          "id": "Z9BhK6XhEvNmHcLU",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6070e65d-c2d1-475e-af7c-c8ff0a5b059a",
+              "name": "content",
+              "value": "={{ $json.text_content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        240
+      ],
+      "id": "e847a821-29d4-46fc-a702-4c590a8ae81b",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d56cc938-d653-4611-96fd-86d5eb56bf9c",
+              "name": "chat_input",
+              "value": "={{ $json.content }}{{ $('Normalizacion').item.json.text_content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        928,
+        0
+      ],
+      "id": "0872db47-7291-4581-be88-8d64416ed3ca",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"chat_id\": {{ $json.message.chat.id }},\n  \"user_name\": \"{{ $json.message.from.first_name }}\",\n  \"username\": \"{{ $json.message.from.username }}\",\n  \"date\": \"{{ $json.message.date }}\",\n  \"type\": \"{{ $json.message.photo ? 'image' : ($json.message.voice ? 'audio' : 'text') }}\",\n  \"text_content\": \"{{ $json.message.text ? $json.message.text : ($json.message.caption ? $json.message.caption : ' ') }}\",\n  \"file_id\": \"{{ $json.message.photo ? $json.message.photo.slice(-1)[0].file_id : ($json.message.voice ? $json.message.voice.file_id : null) }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        16
+      ],
+      "id": "3d49dc03-2a0f-4961-91a8-383e2624aab9",
+      "name": "Normalizacion"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        16
+      ],
+      "id": "99394b08-32e8-4b08-b062-40c7d07be7ac",
+      "name": "Telegram Trigger",
+      "webhookId": "6e1ee5cf-0b39-403e-b070-39fcc243a7a1",
+      "credentials": {
+        "telegramApi": {
+          "id": "NVNBJOb8Bg6WSnni",
+          "name": "Telegram account_Alex_financeHealth_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        -192
+      ],
+      "id": "62710997-1e62-4db6-a9d8-7c5d96547e00",
+      "name": "Get a file",
+      "webhookId": "22084167-1a4b-4ccf-8a09-61a94d9abf96",
+      "credentials": {
+        "telegramApi": {
+          "id": "NVNBJOb8Bg6WSnni",
+          "name": "Telegram account_Alex_financeHealth_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        416,
+        -192
+      ],
+      "id": "e6948ed4-c01f-40bb-86cb-b97bdf2df39c",
+      "name": "Transcribe a recording1",
+      "credentials": {
+        "openAiApi": {
+          "id": "Z9BhK6XhEvNmHcLU",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "e6784847-b72f-431c-bb5d-a36778b95994",
+      "name": "Get a file1",
+      "webhookId": "4e245c95-c33b-4b28-9d24-165964e1f67a",
+      "credentials": {
+        "telegramApi": {
+          "id": "NVNBJOb8Bg6WSnni",
+          "name": "Telegram account_Alex_financeHealth_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"registros\": [\n    {\n      \"Fecha\": \"dd/MM/yyyy\",\n      \"Mes\": \"String\",\n      \"Concepto\": \"String (Resumen de los ítems agrupados)\",\n      \"Monto\": 0.00,\n      \"Tipo Movimiento\": [\"Gasto\", \"Ingreso\", \"Transferencia\"],\n      \"Cuenta Origen\": \"String exacto lista A\",\n      \"Cuenta Destino\": \"String exacto lista A\",\n      \"Categoria\": \"String exacto lista B\",\n      \"sub_categoria\": \"String exacto lista B\",\n      \"beneficiario\": \"Nombre estandarizado\",\n      \"etiqueta_valor\": \"String exacto lista C\"\n    }\n  ],\n  \"feedback_global\": \"Mensaje único para Telegram con resumen y tip personalizado.\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1408,
+        272
+      ],
+      "id": "d6672a18-faa5-4783-b1ac-71e003478a1f",
+      "name": "Structured Output Parser",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1D8eOjyfMqefE0EdksbUbDoT0lJGXpyIaRlEJakJZB-U",
+          "mode": "list",
+          "cachedResultName": "Registro_Personal_2026",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D8eOjyfMqefE0EdksbUbDoT0lJGXpyIaRlEJakJZB-U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D8eOjyfMqefE0EdksbUbDoT0lJGXpyIaRlEJakJZB-U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $json.Fecha }}",
+            "Mes": "={{ $json.Mes }}",
+            "Concepto": "={{ $json.Concepto }}",
+            "Monto ": "={{ $json.Monto }}",
+            "Tipo Movimiento": "={{ $json['Tipo Movimiento'] }}",
+            "Cuenta Origen": "={{ $json['Cuenta Origen'] }}",
+            "Cuenta Destino": "={{ $json['Cuenta Destino'] }}",
+            "Categoria": "={{ $json.Categoria }}",
+            "Sub-Categoria": "={{ $json.sub_categoria }}",
+            "Beneficiario": "={{ $json.beneficiario }}",
+            "Etiqueta Valor": "={{ $json.etiqueta_valor }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mes",
+              "displayName": "Mes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Concepto",
+              "displayName": "Concepto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Monto ",
+              "displayName": "Monto ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo Movimiento",
+              "displayName": "Tipo Movimiento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cuenta Origen",
+              "displayName": "Cuenta Origen",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cuenta Destino",
+              "displayName": "Cuenta Destino",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Categoria",
+              "displayName": "Categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sub-Categoria",
+              "displayName": "Sub-Categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Beneficiario",
+              "displayName": "Beneficiario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Etiqueta Valor",
+              "displayName": "Etiqueta Valor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2048,
+        144
+      ],
+      "id": "65ede66c-18b1-481a-a213-bd510d06db1e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5AA2hROQqe8TqqJy",
+          "name": "Google Sheets account_Alejandro Rivera"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f8cb58cd-6a1e-454b-b80f-f266c868ec29",
+              "name": "registros",
+              "value": "={{ $json.output.registros }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1488,
+        0
+      ],
+      "id": "30ee5d1b-fb71-45ad-880c-3b95c054f401",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1888,
+        -16
+      ],
+      "id": "2ec5dc1d-212e-4ffe-92fd-d6cf37731792",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "registros",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        0
+      ],
+      "id": "b2d24038-2d0d-4f67-b09b-b16189872674",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Normalizacion').item.json.chat_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1200,
+        256
+      ],
+      "id": "d01bc25c-7272-4a2a-b42f-a5a66b37dded",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Normalizacion').item.json.chat_id}}",
+        "text": "={{ $('AI Agent').item.json.output.feedback_global }}",
+        "replyMarkup": "forceReply",
+        "forceReply": {},
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        -336
+      ],
+      "id": "e07d3308-1d75-4633-89ab-0eace4e4eb87",
+      "name": "Send a text message",
+      "webhookId": "e5c54064-114e-4881-9bcb-5d366ee3a683",
+      "credentials": {
+        "telegramApi": {
+          "id": "NVNBJOb8Bg6WSnni",
+          "name": "Telegram account_Alex_financeHealth_bot"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Edit Fields": [
+      {
+        "json": {
+          "chat_input": "A ingressa ou apoio de mamá é de 500 pesos a milhão daquilo. "
+        }
+      }
+    ],
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 279710731,
+          "message": {
+            "message_id": 48,
+            "from": {
+              "id": 1166227366,
+              "is_bot": false,
+              "first_name": "Alejandr0",
+              "username": "AlejandroTheCreator",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 1166227366,
+              "first_name": "Alejandr0",
+              "username": "AlejandroTheCreator",
+              "type": "private"
+            },
+            "date": 1768024766,
+            "voice": {
+              "duration": 4,
+              "mime_type": "audio/ogg",
+              "file_id": "AwACAgEAAxkBAAMwaWHqvm1AgLZhyddz2zPDt7j9RTcAAngHAALt4hBHkzVb5gizQGE4BA",
+              "file_unique_id": "AgADeAcAAu3iEEc",
+              "file_size": 16134
+            }
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio Content": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio Content1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Describe imagen": {
+      "main": [
+        [
+          {
+            "node": "Audio Content1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizacion": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalizacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording1": {
+      "main": [
+        [
+          {
+            "node": "Audio Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file1": {
+      "main": [
+        [
+          {
+            "node": "Describe imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "America/Mexico_City",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "1ab19969-3822-4555-8ca8-029d893de6da",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c65ac1e778873bb690dba4e27600afa0ca5276a98dccbe03dd074328f9965ba"
+  },
+  "id": "rOfQLHplwtxtdro4",
+  "tags": [
+    {
+      "updatedAt": "2026-01-09T05:16:30.010Z",
+      "createdAt": "2026-01-09T05:16:30.010Z",
+      "id": "Eyxe6AAjl92n5Tbp",
+      "name": "Alex"
+    }
+  ]
+}
