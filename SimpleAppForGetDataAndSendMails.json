@@ -1,0 +1,494 @@
+{
+  "name": "HunterFreelance Frontend-Backend",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "90010168-b21f-429d-970f-41584d356d8b",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8a4babdd-01e2-498d-ad83-9371089a4494",
+      "name": "Webhook",
+      "webhookId": "90010168-b21f-429d-970f-41584d356d8b"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "pfFT7VadYhFLB03P",
+          "mode": "list",
+          "cachedResultName": "Freelance",
+          "cachedResultUrl": "/projects/ZllG2HeGCR1Fl5US/datatables/pfFT7VadYhFLB03P"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "minRate": "={{ $json.body.minRate }}",
+            "brandName": "={{ $json.body.brandName }}",
+            "uvp": "={{ $json.body.uvp }}",
+            "portafolioLink": "={{ $json.body.portfolioLink }}",
+            "keywords": "={{ $json.body.keywords }}",
+            "niche": "={{ $json.body.niches }}",
+            "sources": "={{ $json.body.sources }}",
+            "blacklist": "={{ $json.body.blacklist }}",
+            "tone": "={{ $json.body.tone }}",
+            "email": "={{ $json.body.email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "brandName",
+              "displayName": "brandName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "uvp",
+              "displayName": "uvp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "portafolioLink",
+              "displayName": "portafolioLink",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "keywords",
+              "displayName": "keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "niche",
+              "displayName": "niche",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sources",
+              "displayName": "sources",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "minRate",
+              "displayName": "minRate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "blacklist",
+              "displayName": "blacklist",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "tone",
+              "displayName": "tone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "optimizeBulk": false
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "53c31743-ae23-4e18-9d67-2b530af22e34",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "59706c0d-6077-4801-a53a-33fb6eba6621",
+              "name": "body.brandName",
+              "value": "={{ $json.body.brandName }}",
+              "type": "string"
+            },
+            {
+              "id": "bec6aefe-4366-415b-ac7c-85ecd2baf74d",
+              "name": "body.uvp",
+              "value": "={{ $json.body.uvp }}",
+              "type": "string"
+            },
+            {
+              "id": "67071621-a494-4b54-a0f0-980076a8c97b",
+              "name": "body.portfolioLink",
+              "value": "={{ $json.body.portfolioLink }}",
+              "type": "string"
+            },
+            {
+              "id": "fdd9305c-b075-4679-a838-e96f3f477d28",
+              "name": "body.keywords",
+              "value": "={{ $json.body.keywords }}",
+              "type": "string"
+            },
+            {
+              "id": "10fd7e40-ed41-4dcb-9833-231a3c1508ea",
+              "name": "body.niches",
+              "value": "={{ $json.body.niches }}",
+              "type": "string"
+            },
+            {
+              "id": "18c98b3c-e61f-407b-89c8-f6af7d5d2f20",
+              "name": "body.sources",
+              "value": "={{ $json.body.sources }}",
+              "type": "string"
+            },
+            {
+              "id": "ab6bd4e7-8635-43b3-a972-ca0d4e6b4bba",
+              "name": "body.minRate",
+              "value": "={{ $json.body.minRate }}",
+              "type": "string"
+            },
+            {
+              "id": "37b60333-cbd7-4439-98a5-6ae376e1e946",
+              "name": "body.blacklist",
+              "value": "={{ $json.body.blacklist }}",
+              "type": "string"
+            },
+            {
+              "id": "0304ba49-b870-412a-a1b2-66d79ad87401",
+              "name": "body.tone",
+              "value": "={{ $json.body.tone }}",
+              "type": "string"
+            },
+            {
+              "id": "a509fa28-0b11-4930-a595-e0a745edde4d",
+              "name": "body.email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e4db20f8-4463-4cda-b90a-75d827320b1a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Actúa como el Asistente de Operaciones de Alejandro Rivera (Consultor de Automatización). Tu misión es redactar un correo electrónico de confirmación que sea profesional, empático y que refuerce la autoridad de Alejandro.\n\nVariables de Entrada (Contexto):\n[\n  {\n    \"brandName\": \"Nombre del cliente o marca\",\n    \"uvp\": \"propuesta de valor\",\n    \"portafolioLink\": \"link de portafolio\",\n    \"keywords\": \"keywords\",\n    \"niche\": \"nichos\",\n    \"sources\": \"sitios de busqueda de empleo del usuario\",\n    \"minRate\": \"sueldo o tarifas\",\n    \"blacklist\": \"black list\",\n    \"tone\": \"tono de sus propuestas\",\n    \"email\": \"croon-motto-fall@duck.com\",\n    \"id\": \"id\",\n    \"createdAt\": \"2026-01-11T06:54:06.293Z\",\n    \"updatedAt\": \"2026-01-11T06:54:06.293Z\"\n  }\n]\n\n\nInstrucciones de Redacción:\n\nTono: Profesional, tecnológico y cercano. Usa un español neutro o de México (tuteo).\n\nPersonalización: Debes mencionar específicamente una de sus Keywords o habilidades y validar su uvp brevemente (ej. \"Me parece fascinante tu enfoque en...\").\n\nEstructura Obligatoria:\n\nAsunto: Debe ser intrigante y profesional y dar a entender que ya esta a nada de tener su bot personal.\n\nCuerpo: * Saludo personalizado.\n\nConfirmación de recepción exitosa de datos.\n\nBreve comentario sobre su perfil (validación).\n\nExplicación de lo que está ocurriendo \"detrás de escena\" (configuración de nodos en el servidor).\n\nInstrucción clara: \"No necesitas hacer nada más, te contactaré por Telegram\".\n\nDespedida firmada por Alejandro Rivera | AI Automation Studio.\n\nRestricciones (Determinismo):\n\nNo inventes servicios que Alejandro no ofrece.\n\nNo excedas las 150 palabras.\n\nNo uses lenguaje excesivamente corporativo o robótico.\nRecuerda que el metodo de comunicacion es por correo.\n\nNotificame en cuanto el correo haya sido enviado.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        640,
+        0
+      ],
+      "id": "6c1569bf-3812-44a6-be3e-48334062034e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        192
+      ],
+      "id": "d06d4835-b8ea-40c8-aa9f-76509ad25c86",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Z9BhK6XhEvNmHcLU",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.headers.host }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        704,
+        256
+      ],
+      "id": "5ab9576e-d554-47b9-b007-c53f4890ea43",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        224
+      ],
+      "id": "ec4741b9-6cab-4853-81bd-df0854c08c89",
+      "name": "Send a message in Gmail",
+      "webhookId": "39e83af4-aa94-48bb-82a8-efcaabed71e4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8NTrS3Q65Gu8j7uV",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "isaac.alejandro@outlook.es",
+        "subject": "Nuevo registro para bot!",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        0
+      ],
+      "id": "c8595f73-77f2-4841-a6e7-31e0f451f897",
+      "name": "Send a message",
+      "webhookId": "11cf8e44-69a2-4392-b981-c763025f87fa",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8NTrS3Q65Gu8j7uV",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "mi-n8n-n8n.4u5ow8.easypanel.host",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+            "content-length": "365",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-US,en;q=0.7",
+            "content-type": "application/json",
+            "origin": "https://lead-hunter-ai-zavala.base44.app",
+            "priority": "u=1, i",
+            "referer": "https://lead-hunter-ai-zavala.base44.app/",
+            "sec-ch-ua": "\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "sec-gpc": "1",
+            "x-forwarded-for": "201.124.175.174",
+            "x-forwarded-host": "mi-n8n-n8n.4u5ow8.easypanel.host",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "37aa2acfa5db",
+            "x-real-ip": "201.124.175.174"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "brandName": "Alejandro Rivera AI Automation",
+            "email": "croon-motto-fall@duck.com",
+            "uvp": "MI propuesta es un agente de IA que atravez de telegram te envie los prospectos de ntu nicho",
+            "portfolioLink": "hhtps://miporta",
+            "keywords": [
+              "UX Designer"
+            ],
+            "niches": [
+              "health",
+              "ecommerce"
+            ],
+            "sources": [
+              "linkedin",
+              "ziprecruiter"
+            ],
+            "minRate": "455",
+            "blacklist": "dd",
+            "tone": "creative"
+          },
+          "webhookUrl": "https://mi-n8n-n8n.4u5ow8.easypanel.host/webhook/90010168-b21f-429d-970f-41584d356d8b",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "America/Mexico_City",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "1ce34928-350d-4b4c-b43a-1d6d4a25c803",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c65ac1e778873bb690dba4e27600afa0ca5276a98dccbe03dd074328f9965ba"
+  },
+  "id": "8I4WLQcNur-AfmZYHmAhP",
+  "tags": []
+}
