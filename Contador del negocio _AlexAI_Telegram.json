@@ -1,5 +1,5 @@
 {
-  "name": "Contador del negocio _AlexAI_Telegram",
+  "name": "Contador Personal_YoliPensiones_Telegram",
   "nodes": [
     {
       "parameters": {
@@ -13,10 +13,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2,
       "position": [
-        1168,
-        0
+        -384,
+        336
       ],
-      "id": "dd439ed9-aa81-4550-a3c2-f2ed0b411819",
+      "id": "5dc69d63-5c9a-4864-8ba3-72ce7238a9ef",
       "name": "AI Agent"
     },
     {
@@ -32,10 +32,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        1072,
-        240
+        -480,
+        576
       ],
-      "id": "f7a03f66-15da-4ce5-82bf-d26b3aa74aae",
+      "id": "4fb03fdd-d301-4dd3-aa65-f1b57e7f8cb0",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
@@ -132,10 +132,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        -64,
-        -16
+        -1616,
+        320
       ],
-      "id": "5ba0b93a-ce80-49b5-b19b-8819e3bb79e4",
+      "id": "15e97aa3-7034-4066-a26b-1ea84c9e6f2c",
       "name": "Switch"
     },
     {
@@ -155,10 +155,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        640,
-        -192
+        -912,
+        144
       ],
-      "id": "a619e46b-dbd7-42e9-ab8d-cdbbf7d01333",
+      "id": "c75b7089-2f75-4b08-bba2-752283a7bd79",
       "name": "Audio Content"
     },
     {
@@ -178,10 +178,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        640,
-        0
+        -912,
+        336
       ],
-      "id": "745cba07-94a6-4195-93f8-71965204bb77",
+      "id": "e5f328eb-f85b-4a22-8c78-a7c829668fa2",
       "name": "Audio Content1"
     },
     {
@@ -201,10 +201,10 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        400,
-        0
+        -1152,
+        336
       ],
-      "id": "c026b86e-ee5a-48d9-bbb9-a1a88aca1f36",
+      "id": "d2dc6355-fc20-4294-a8ad-b7a7f7265bc5",
       "name": "Describe imagen",
       "credentials": {
         "openAiApi": {
@@ -230,10 +230,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        448,
-        240
+        -1104,
+        576
       ],
-      "id": "e847a821-29d4-46fc-a702-4c590a8ae81b",
+      "id": "09e1838c-4e72-4454-b56a-9a47d8515546",
       "name": "Edit Fields2"
     },
     {
@@ -253,10 +253,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        928,
-        0
+        -624,
+        336
       ],
-      "id": "0872db47-7291-4581-be88-8d64416ed3ca",
+      "id": "1a471338-56ae-47b5-9f49-b5f437da7907",
       "name": "Edit Fields"
     },
     {
@@ -268,10 +268,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -272,
-        16
+        -1824,
+        352
       ],
-      "id": "3d49dc03-2a0f-4961-91a8-383e2624aab9",
+      "id": "16c18bed-d74c-4f24-8df4-4ae605f4df30",
       "name": "Normalizacion"
     },
     {
@@ -284,10 +284,10 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -480,
-        16
+        -2032,
+        352
       ],
-      "id": "99394b08-32e8-4b08-b062-40c7d07be7ac",
+      "id": "734226b2-acbb-452e-8dd3-29d558fb2406",
       "name": "Telegram Trigger",
       "webhookId": "6e1ee5cf-0b39-403e-b070-39fcc243a7a1",
       "credentials": {
@@ -306,10 +306,10 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        256,
-        -192
+        -1296,
+        144
       ],
-      "id": "62710997-1e62-4db6-a9d8-7c5d96547e00",
+      "id": "d80baef1-745c-41ac-9f91-2d30429a9748",
       "name": "Get a file",
       "webhookId": "22084167-1a4b-4ccf-8a09-61a94d9abf96",
       "credentials": {
@@ -328,10 +328,10 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2.1,
       "position": [
-        416,
-        -192
+        -1136,
+        144
       ],
-      "id": "e6948ed4-c01f-40bb-86cb-b97bdf2df39c",
+      "id": "2a9308fe-6fd9-427b-ac46-29dad02f335c",
       "name": "Transcribe a recording1",
       "credentials": {
         "openAiApi": {
@@ -349,10 +349,10 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        240,
-        0
+        -1312,
+        336
       ],
-      "id": "e6784847-b72f-431c-bb5d-a36778b95994",
+      "id": "ff0deb57-ad55-48bd-8dfd-558c95972390",
       "name": "Get a file1",
       "webhookId": "4e245c95-c33b-4b28-9d24-165964e1f67a",
       "credentials": {
@@ -370,10 +370,10 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        1408,
-        272
+        -144,
+        608
       ],
-      "id": "d6672a18-faa5-4783-b1ac-71e003478a1f",
+      "id": "de9f701e-f078-432e-8a6b-2474f25a352b",
       "name": "Structured Output Parser",
       "onError": "continueErrorOutput"
     },
@@ -519,10 +519,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        2048,
-        144
+        496,
+        480
       ],
-      "id": "65ede66c-18b1-481a-a213-bd510d06db1e",
+      "id": "274d37b1-8f3a-4167-9aa2-dc454e9b51a8",
       "name": "Append row in sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -548,10 +548,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1488,
-        0
+        -64,
+        336
       ],
-      "id": "30ee5d1b-fb71-45ad-880c-3b95c054f401",
+      "id": "5b751351-dfd5-4dce-9395-a99788250505",
       "name": "Edit Fields1"
     },
     {
@@ -563,10 +563,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1888,
-        -16
+        336,
+        320
       ],
-      "id": "2ec5dc1d-212e-4ffe-92fd-d6cf37731792",
+      "id": "2c42b311-d2f4-499b-9039-fec579ed2d18",
       "name": "Loop Over Items"
     },
     {
@@ -577,10 +577,10 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        1648,
-        0
+        96,
+        336
       ],
-      "id": "b2d24038-2d0d-4f67-b09b-b16189872674",
+      "id": "7631c2f6-7a99-4fb7-a787-c0ab58f51fdb",
       "name": "Split Out"
     },
     {
@@ -591,10 +591,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        1200,
-        256
+        -352,
+        592
       ],
-      "id": "d01bc25c-7272-4a2a-b42f-a5a66b37dded",
+      "id": "69751ca0-e5be-47c7-8560-d833db703800",
       "name": "Simple Memory"
     },
     {
@@ -610,10 +610,10 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1552,
-        -336
+        0,
+        0
       ],
-      "id": "e07d3308-1d75-4633-89ab-0eace4e4eb87",
+      "id": "c719bdb9-dddd-4349-acf7-dab1062515d5",
       "name": "Send a text message",
       "webhookId": "e5c54064-114e-4881-9bcb-5d366ee3a683",
       "credentials": {
@@ -895,26 +895,29 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
-    "availableInMCP": false,
-    "timeSavedMode": "fixed",
-    "timezone": "America/Mexico_City",
-    "callerPolicy": "workflowsFromSameOwner"
+    "availableInMCP": false
   },
-  "versionId": "1ab19969-3822-4555-8ca8-029d893de6da",
+  "versionId": "36b6d297-52f6-4995-a491-539642f86dee",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "4c65ac1e778873bb690dba4e27600afa0ca5276a98dccbe03dd074328f9965ba"
   },
-  "id": "rOfQLHplwtxtdro4",
+  "id": "h77Y5N5d9aQqwYKi",
   "tags": [
     {
-      "updatedAt": "2026-01-09T05:16:30.010Z",
-      "createdAt": "2026-01-09T05:16:30.010Z",
-      "id": "Eyxe6AAjl92n5Tbp",
-      "name": "Alex"
+      "name": "Yoli",
+      "id": "LxNFaurS5V7TWebp",
+      "updatedAt": "2026-01-11T07:30:37.368Z",
+      "createdAt": "2026-01-11T07:30:37.368Z"
+    },
+    {
+      "name": "Contador_Personal",
+      "id": "P42jbQdVqm63wgSU",
+      "updatedAt": "2026-01-11T07:31:14.641Z",
+      "createdAt": "2026-01-11T07:31:14.641Z"
     }
   ]
 }
