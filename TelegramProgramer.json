@@ -1,0 +1,835 @@
+{
+  "name": "TelegramProgramer",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c1543802-1fba-4c2f-b376-875c186df46f",
+      "name": "Telegram Trigger",
+      "webhookId": "6994fff4-3b4d-4a76-a36b-0bdde8b9633d",
+      "credentials": {
+        "telegramApi": {
+          "id": "7aPgVNKsod3JmMnD",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7f4161d2-fd38-485b-bcdb-01da091073f0",
+              "name": "chatID",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "6020149a-4b08-4fa1-83d1-c2c8a16d664f",
+              "name": "type",
+              "value": "={{ $json.message.photo ? 'image' : ($json.message.voice ? 'audio' : ($json.message.video ? 'video' : ($json.message.text ? 'text' : 'unknown')))}}",
+              "type": "string"
+            },
+            {
+              "id": "0edd59cd-7415-46bb-be04-00efc4081c55",
+              "name": "Text",
+              "value": "={{$json.message.text ? $json.message.text :($json.message.caption ? $json.message.caption: 'undefined')}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        32
+      ],
+      "id": "a3c2786c-9371-4818-a97e-83524bac6a93",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e114e1dd-49e4-4d9f-ace6-5ff25db93c13"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c2c74f9d-ed9e-4ff7-a841-389455f211c4",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6c8141f3-d617-4806-8cfd-30dc51687342",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Only text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "006077bc-0a63-4c60-a536-ed0092fc8573",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.caption }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Caption"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "f1a2732b-a12e-451e-af15-9ce1304e702b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.photo[3].file_id }}",
+        "additionalFields": {
+          "mimeType": "image/jpeg"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        -272
+      ],
+      "id": "d79058a9-cd6e-4a28-b1e6-4e0a535711c5",
+      "name": "Get a image",
+      "webhookId": "ccf00f0f-4b50-4d54-a2c5-0c4c6ac68079",
+      "credentials": {
+        "telegramApi": {
+          "id": "7aPgVNKsod3JmMnD",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        -96
+      ],
+      "id": "85d0937a-2503-466b-a255-1967250a9d00",
+      "name": "Get an audio",
+      "webhookId": "46e28058-c3bc-4604-aaac-2f09e20a94a7",
+      "credentials": {
+        "telegramApi": {
+          "id": "7aPgVNKsod3JmMnD",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "404884d8-cd8e-42b0-8b48-3781393e8bae",
+              "name": "chatID",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "a7bf15ec-6ed5-4390-b297-eb250c64f53c",
+              "name": "instruction ",
+              "value": "={{$json.Text}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        64
+      ],
+      "id": "e019fd08-a702-454b-a130-b830aa09ff6f",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Not recognized ",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        192
+      ],
+      "id": "7ed84a2f-93d5-44ba-bf5a-3c3c294d202f",
+      "name": "Send a text message",
+      "webhookId": "4dd45c15-afca-4736-a0e5-f6daa2a6559f",
+      "credentials": {
+        "telegramApi": {
+          "id": "7aPgVNKsod3JmMnD",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "What's in this audio? ( Transcribe) ",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        960,
+        -96
+      ],
+      "id": "a90f48ec-4e11-44b2-b4ac-6197813f1c1b",
+      "name": "Analyze audio",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "fOF8AyazCRWQorif",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "What's in this image?\n\n",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        976,
+        -272
+      ],
+      "id": "17a63afa-e6e2-4238-94c4-f0f54856a539",
+      "name": "Analyze image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "fOF8AyazCRWQorif",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1936,
+        112
+      ],
+      "id": "c5ce9c16-3726-4231-9cd1-0f6edb2af80b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "fOF8AyazCRWQorif",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e2644e1-fe2b-4523-b3bc-3db62622315c",
+              "name": "content",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        -96
+      ],
+      "id": "ce19c8e6-50d9-4891-8f8f-8dcffdf6b1e8",
+      "name": "Audio Content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e2644e1-fe2b-4523-b3bc-3db62622315c",
+              "name": "content",
+              "value": "=<imagen>\n{{ $json.content.parts[0].text }}\n</imagen>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1408,
+        -272
+      ],
+      "id": "887c53fd-44be-4a92-99ba-2f5b528a7dc4",
+      "name": "Image Content1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "50f60dc3-b1f3-4953-b3ab-75111fbf385c",
+              "name": "Instruction",
+              "value": "={{ $json[\"instruction \"] }}",
+              "type": "string"
+            },
+            {
+              "id": "3f932d23-ebc2-47cd-afa5-e62d61b948b4",
+              "name": "Content",
+              "value": "={{ $json.content ? $json.content : ''}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1744,
+        -96
+      ],
+      "id": "7f083249-cb2f-455c-bf58-ad76a489aa9d",
+      "name": "Chat input"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create a file in GitHub",
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "RiveraTheCreator",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "Programacion-en-C-Joyanes",
+          "mode": "list",
+          "cachedResultName": "Programacion-en-C-Joyanes",
+          "cachedResultUrl": "https://github.com/RiveraTheCreator/Programacion-en-C-Joyanes"
+        },
+        "filePath": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File_Path', ``, 'string') }}",
+        "fileContent": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File_Content', ``, 'string') }}",
+        "commitMessage": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Commit_Message', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.githubTool",
+      "typeVersion": 1.1,
+      "position": [
+        2304,
+        176
+      ],
+      "id": "e18890d7-ca5f-42a5-acd1-77542aa6ac99",
+      "name": "Create a file in GitHub",
+      "webhookId": "2ba79a84-5ff7-4431-977f-6e473c478c8c",
+      "credentials": {
+        "githubApi": {
+          "id": "IOBt5jRJb0s2c4AR",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.Output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2752,
+        -96
+      ],
+      "id": "1ea78fc5-a1e3-4c2d-9995-e958a60b33c2",
+      "name": "Send a text message1",
+      "webhookId": "7fb83ef8-e3fd-4505-8a99-451d95dffc1e",
+      "credentials": {
+        "telegramApi": {
+          "id": "7aPgVNKsod3JmMnD",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Mensaje del uduario: \n{{ $json.Content }}\n{{ $json.Instruction }}\n\n\nREMEMBER TO ALWAYS USE format_final_response at the end of every response.",
+        "options": {
+          "systemMessage": "**[Rol del Agente]**\nEres **GitHub Genius**, un agente de IA multifuncional. Tambien eres un **tutor de programación** interactivo , especializado en ayudar a los usuarios a aprender y reforzar conceptos de código.Además, eres **GitHub Genie**, un experto en tareas relacionadas con GitHub.\n\nTu objetivo es guiar al usuario a través de la resolución de problemas, asegurando que entienda la lógica detrás de la solución, y asistirle con tareas de GitHub, manteniendo un enfoque profesional y claro en todo momento.\n\n---\n\n### Flujo de Interacción y Herramientas\n\n1.  **Recepción de Desafío:** El usuario te enviará un ejercicio o reto de programación\n2.  **Análisis y Solución:** Tu primera tarea es analizar y comprender el problema para desarrollar una solución de código clara y bien comentada.\n3.  **Gestión de GitHub:** Antes de interactuar con el usuario, debes subir la solución a un repositorio de GitHub como parte de la estrategia gamificada. Utiliza tus herramientas para realizar esta acción. Tienes acceso de lectura y escritura a los repositorios públicos y privados del usuario @RiveraTheCreator su perfil se encuentra en la siguiente URL `https://github.com/RiveraTheCreator`. El codigo lo subiras al repositorio con nombre `Programacion-en-C-Joyanes` existente en la siguiente URL `https://github.com/RiveraTheCreator/Programacion-en-C-Joyanes` en la ruta `/`. Tu enviaras un objeto JSON a la api Github con este formato, te doy un ejemplo.\n```JSON\n[\n{\n\"File_Path\": \n\"example.c\",\n\"File_Content\": \n\"#include<stdio.h>\",\n\"Commit_Message\": \n\"Ejemplo para que el agente entienda\"\n}\n]\n```\nDonde \"File_Path\" pondras el NOMBRE DEL PROGRAMA \n\"File_Content\" pondras el CODIGO DEL PROGRAMA,\n4.  **Desglose Inicial:** Después de subir la solución, no la reveles de inmediato.Comienza por desglosar el problema en partes más pequeñas para el usuario.\n5.**Entrega Interactiva de Código:** Comparte el código en fragmentos y explica la lógica de cada uno. Usa estrategias de aprendizaje como:\n    * **Preguntas de Comprensión:** Haz preguntas para confirmar el entendimiento.\n    * **Desafíos de Modificación:** Reta al usuario a modificar el código para fomentar la experimentación.\n6.  **Revisión y Consolidación:** Una vez que el usuario ha demostrado su comprensión, entrégale la solución final completa y el enlace al repositorio de GitHub donde se encuentra el código.\n7.  **Cierre y Próximos Pasos:** Finaliza motivando al usuario a aplicar lo que aprendió y anímalo a que te comparta otro reto.\n\n---\n\n### Poderes y Restricciones\n* **Identidad y Acceso:** Tienes acceso de lectura y escritura a los repositorios de GitHub del usuario.\n* **Uso de Herramientas:** Siempre verifica si la herramienta que necesitas está disponible antes de ejecutar una tarea. Si no estás seguro, pide aclaración o revisa la lista de herramientas.\n    * Si una herramienta falla, revisa la lista y usa el nombre exacto antes de volver a intentarlo.\n* **Confirmación de Acciones:** Antes de realizar cualquier acción que modifique un repositorio (como fusionar una rama), confirma con el usuario que debe proceder y describe claramente el resultado de la acción].\n* **Privacidad y Seguridad:** No reveles contenido confidencial de los repositorios, como tokens o secretos.Si se te pide, rechaza la solicitud de manera educada.\n* **Enfoque:** Mantente en el tema de las tareas de GitHub, como revisiones de código, gestión de incidencias y documentación.\n* **Formato**: La salida se enviara a un nodo de telegram asi que asegura que los datos de salida se envien correctamete parseados en html de tal forma que no se tenga el error `Bad request - please check your parameters\nBad Request: can't parse entities`.\n* **Comando de Escape:** Continúa la interacción hasta que el usuario demuestre comprensión o use los comandos de escape `/out` o `Finaliza el test`[cite: 38].\n\n---\n\n### Comunicación y Estilo\n\n* **Tono:** Usa un tono amigable, profesional y motivador.\n* **Claridad:** Explica los conceptos de manera sencilla, evitando jerga excesiva. Usa analogías cuando sea necesario.\n* **Código:** Cuando generes o revises código, siempre ofrece explicaciones claras y constructivas.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2064,
+        -96
+      ],
+      "id": "196de7e6-b1c6-4d2f-b1c1-6c92da9bd37b",
+      "name": "GitHub Assistant"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Edit Fields').item.json.chatID }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2080,
+        112
+      ],
+      "id": "41f4765f-5472-4802-9222-f80ae3b95e4a",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4bd2eedf-7619-4776-a4dd-8952ebd1d202",
+              "name": "Output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2416,
+        -96
+      ],
+      "id": "101fa76b-c294-4415-a092-e2d00268e9f9",
+      "name": "Final Message to user"
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 7169738,
+          "message": {
+            "message_id": 188,
+            "from": {
+              "id": 1166227366,
+              "is_bot": false,
+              "first_name": "Alejandr0",
+              "username": "AlejandroTheCreator",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 1166227366,
+              "first_name": "Alejandr0",
+              "username": "AlejandroTheCreator",
+              "type": "private"
+            },
+            "date": 1757463030,
+            "photo": [
+              {
+                "file_id": "AgACAgEAAxkBAAO8aMDB9ibjsdWoXslWK5qS069Wbm8AAkqwMRu_OAhGzF6ABko25gsBAAMCAANzAAM2BA",
+                "file_unique_id": "AQADSrAxG784CEZ4",
+                "file_size": 703,
+                "width": 90,
+                "height": 21
+              },
+              {
+                "file_id": "AgACAgEAAxkBAAO8aMDB9ibjsdWoXslWK5qS069Wbm8AAkqwMRu_OAhGzF6ABko25gsBAAMCAANtAAM2BA",
+                "file_unique_id": "AQADSrAxG784CEZy",
+                "file_size": 12352,
+                "width": 320,
+                "height": 75
+              },
+              {
+                "file_id": "AgACAgEAAxkBAAO8aMDB9ibjsdWoXslWK5qS069Wbm8AAkqwMRu_OAhGzF6ABko25gsBAAMCAAN4AAM2BA",
+                "file_unique_id": "AQADSrAxG784CEZ9",
+                "file_size": 56643,
+                "width": 800,
+                "height": 188
+              },
+              {
+                "file_id": "AgACAgEAAxkBAAO8aMDB9ibjsdWoXslWK5qS069Wbm8AAkqwMRu_OAhGzF6ABko25gsBAAMCAAN5AAM2BA",
+                "file_unique_id": "AQADSrAxG784CEZ-",
+                "file_size": 64935,
+                "width": 1135,
+                "height": 267
+              }
+            ],
+            "caption": "Vamos a por este programa"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get a image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get an audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a image": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an audio": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Chat input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze audio": {
+      "main": [
+        [
+          {
+            "node": "Audio Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Image Content1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "GitHub Assistant",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio Content": {
+      "main": [
+        [
+          {
+            "node": "Chat input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Content1": {
+      "main": [
+        [
+          {
+            "node": "Chat input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat input": {
+      "main": [
+        [
+          {
+            "node": "GitHub Assistant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a file in GitHub": {
+      "ai_tool": [
+        [
+          {
+            "node": "GitHub Assistant",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub Assistant": {
+      "main": [
+        [
+          {
+            "node": "Final Message to user",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "GitHub Assistant",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Message to user": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Mexico_City",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "1aa5ceb4-c4d7-47f2-8b04-3d725be32d01",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "524f51763c6810df6f21c7db900a932ceae32c99aafc837c78bd349c79398f2d"
+  },
+  "id": "5wZy9RFsGYGP331t",
+  "tags": [
+    {
+      "createdAt": "2025-09-09T04:45:02.147Z",
+      "updatedAt": "2025-09-09T04:45:02.147Z",
+      "id": "dShgRqYSEHTJBQzG",
+      "name": "Personal"
+    },
+    {
+      "createdAt": "2025-09-09T04:45:05.016Z",
+      "updatedAt": "2025-09-09T04:45:05.016Z",
+      "id": "dix3smyXkgcLFh4V",
+      "name": "Education"
+    }
+  ]
+}
