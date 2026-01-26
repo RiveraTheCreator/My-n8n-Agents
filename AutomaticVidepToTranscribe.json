@@ -1,0 +1,890 @@
+{
+  "name": "Automatic YouTube to Shorts",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"folderName\": \"{{ $json.stdout.replace(/\\.[^/.]+$/, \"\") }}\n}\n",
+        "options": {}
+      },
+      "id": "f20a4e94-dfea-433e-8085-52e7cc6c45b6",
+      "name": "Get File Name",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -192,
+        -816
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Part 1 - Create Clips",
+        "height": 470.4235333453754,
+        "width": 1268.6378420310125,
+        "color": 3
+      },
+      "id": "13ebea8f-e107-4296-b117-9cfa1794ec60",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -912
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=mkdir /files/mkdir /files/{{ $json.folderName.replace(/\\.[^/.]+$/, \"\") }}\n"
+      },
+      "id": "b26212ca-f0d7-433e-b391-096ca8ced22e",
+      "name": "Create Folder for Video",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -816
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=whisper /files/{{ $('Get File Name').item.json.folderName }}.wav --model /models/ggml-small.bin --language es -oj -of /files/{{ $('Get File Name').item.json.folderName }}/transcript\n\n"
+      },
+      "id": "e8f42298-d49f-4ab1-b44f-067ff90bcaa0",
+      "name": "Run Whisper for Transcript",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        704,
+        -816
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert marketer helping to build short clips from a full video. In this case we are trying identify the steps from this tutorial to create a short video out of a long tutorial. Provided is the transcript of the video with timestamps. Return the timestamps that are relevant for a complete step by step tutorial in short form, only the specific steps, no filler or explanation needed. Provide all clip timestamps outputted in JSON format like so:\n{ \"clip1\": \"<timestamps>\", \"clip2\": \"<timestamp>\",...}\n\nHere is the transcript:\n {{ $json.stdout }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "65e41a1e-0b16-4854-acca-b5d00dbaff6e",
+      "name": "Identify Clips with Timestamps",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        -400,
+        -576
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "EXOwwjSfNqx4ndc7",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.message.content.command }}"
+      },
+      "id": "3e800318-2a31-4577-8caa-b77c424ce8ea",
+      "name": "Execute ffmpeg cmd",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -576
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=mkdir /files/{{ $('Get File Name').item.json.folderName }}/clips/"
+      },
+      "id": "df641c1b-fe6e-45ec-b8cf-d8acc1e75e99",
+      "name": "Create Clips Folder",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -816
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=mkdir /files/{{ $('Get File Name').item.json.folderName }}/mobile-clips/"
+      },
+      "id": "1fdb79b8-ff3f-4e51-865f-42f9c7bec5ca",
+      "name": "Create Mobile Clips Folder",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -816
+      ]
+    },
+    {
+      "parameters": {
+        "fileSelector": "=automated-shorts/{{ $('Get File Name').item.json.folderName }}/clips/*.mp4",
+        "options": {}
+      },
+      "id": "42eaed2f-db0a-4cfb-81d5-0abccf2ef891",
+      "name": "Read/Write Files from Disk",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        560,
+        -576
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "7523fdb0-9834-4635-ac19-74276e4ded0d",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        48,
+        -336
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "content": "## Part 2 - Reformat Clips",
+        "height": 355.52848752049835,
+        "width": 1273.7067411115218,
+        "color": 5
+      },
+      "id": "053cbce1-e905-4ef2-b28f-a3417a5148be",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -448
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "def00c26-1115-4577-8700-da649e21ecda",
+              "name": "videoFolder",
+              "value": "=automated-shorts/{{ $('Get File Name').item.json.folderName }}",
+              "type": "string"
+            },
+            {
+              "id": "35a765a7-719a-4bad-b636-6c92f47d8fd6",
+              "name": "clipFileName",
+              "value": "={{ $json.fileName.replace(\".mp4\",\"\") }}",
+              "type": "string"
+            },
+            {
+              "id": "a01fb0fd-b126-4af5-97db-0df376ca786e",
+              "name": "clip9x16File",
+              "value": "={{ $json.directory }}/{{ $json.fileName.replace(\".mp4\",\"\") }}_9x16.mp4",
+              "type": "string"
+            },
+            {
+              "id": "70295334-7fa4-43f5-8c38-b919c0a21b89",
+              "name": "mobileClipFile",
+              "value": "={{ $json.directory.replace(\"/clips\",\"/mobile-clips\") }}/mobile-{{ $json.fileName }}",
+              "type": "string"
+            },
+            {
+              "id": "19994a8d-9193-463c-a5cc-77dfacd4ebdd",
+              "name": "originalClipFile",
+              "value": "={{ $json.directory }}/{{ $json.fileName }}",
+              "type": "string"
+            },
+            {
+              "id": "deb1e743-2482-49e0-8c8f-9d9e3393aca3",
+              "name": "webcamFeedClipFile",
+              "value": "={{ $json.directory }}/{{ $json.fileName.replace(\".mp4\",\"\") }}_webcam_feed.mp4",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9bc7c326-f17c-4744-b445-38ec1a2e1f97",
+      "name": "Video Values",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Given these timestamps, generate an ffmpeg command to pull those specific clips out of a given video. The goal is the create individual short clips from a long video.\n\nReturn the executable command in a json object like this:\n{ \"command\": <\"ffmpeg command here\"> }\n\nPlease use the input file name for the command:\n/files/{{ $('Get File Name').item.json.folderName }}.mp4\n\nPlease make sure the resulting clips are named \"clip1.mp4, clip2.mp4, ...\" and put them in the following folder:\n/files/{{ $('Get File Name').item.json.folderName }}/clips/\n\nHere are the timestamps in a json object to use for the command:\n{{ $json.message.content.clip1 }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "b995d87b-694f-4729-9f5c-f31234f4e608",
+      "name": "Create ffmpeg cmd for clips",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        -80,
+        -576
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "EXOwwjSfNqx4ndc7",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -i {{ $json.originalClipFile }} -vf \"crop=in_h*9/16:in_h:(in_w-in_h*9/16)/2:0\" -c:a copy {{ $json.clip9x16File }}"
+      },
+      "id": "8b2fa192-cd52-4e8a-b2d1-d562e8377575",
+      "name": "ffmpeg 9x16 clip",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        256,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -i {{ $('Video Values').item.json.clip9x16File }} -i {{ $('Video Values').item.json.webcamFeedClipFile }} -filter_complex \"[0:v][1:v]overlay=(main_w-overlay_w)/2:main_h-overlay_h\" -c:a copy {{ $('Video Values').item.json.mobileClipFile }}"
+      },
+      "id": "db52bc7b-99f2-4f05-9a01-edf6e3d52d65",
+      "name": "ffmpeg mobile clip",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        848,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -i {{ $('Video Values').item.json.originalClipFile }} -vf \"crop=480:270:0:810\" -c:a copy {{ $('Video Values').item.json.webcamFeedClipFile }}"
+      },
+      "id": "56b62704-1583-4d8a-af73-e0f11d708cdc",
+      "name": "ffmpeg camera feed clip",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -336
+      ]
+    },
+    {
+      "parameters": {
+        "keep": "lastItems"
+      },
+      "id": "ff124a2b-9c17-43be-b1b2-905209e7f2c4",
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Video Values').last().json.videoFolder }}/mobile-clips/*.mp4",
+        "options": {}
+      },
+      "id": "f6a95edd-e69f-4dbe-918f-89798f9b78c2",
+      "name": "Read/Write Files from Disk1",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "fileName"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4370c2cf-f009-42ee-90c6-c962fbf3b06c",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        16,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('Video Values').last().json.videoFolder }}/mobile-full.ass",
+        "options": {}
+      },
+      "id": "f5cce434-eb3d-4cc3-9a6d-79f2278528a7",
+      "name": "Read/Write Files from Disk2",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        400,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "message.content.fileContent",
+        "options": {}
+      },
+      "id": "9ddfd6e1-af66-41ee-8f76-3844c190d027",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        176,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Part 3 - Combining and Subtitles",
+        "height": 501.18617346761016,
+        "width": 1273.706741111522,
+        "color": 4
+      },
+      "id": "33dd6083-fa4a-4d60-a063-9cb8fcf3fa07",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Given a list of video files, generate an ffmpeg command that will combine them all sequentially in order into 1 clip. Do not concat, use the -filter-complex command. \n\nThe input files will be in this directory:  {{ $('Video Values').last().json.videoFolder }}/mobile-clips\n\nReference the input files like this:\n {{ $('Video Values').last().json.videoFolder }}/mobile-clips/mobile-clip1.mp4\n\nOutput the resulting video with this file name: \n {{ $('Video Values').last().json.videoFolder }}/mobile-full.mp4\n\nReturn the response in a JSON format like this:\n{ \"command\": \"<ffmpeg command here>\" }\n\nHere is the list of video files:\n{{ $json.fileName }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "efce825f-4bac-4467-97ae-2cb3d4acb340",
+      "name": "Combine Clips Command",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        240,
+        -16
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "EXOwwjSfNqx4ndc7",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.message.content.command }}"
+      },
+      "id": "4d72f0a2-0341-47cf-9bb8-c29f474de57a",
+      "name": "Create Short",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=whisper {{ $('Video Values').last().json.videoFolder }}/mobile-full.mp4 --model base --output_format json --output_dir {{ $('Video Values').last().json.videoFolder }}"
+      },
+      "id": "e0486da9-c757-4492-9e24-5bee686c8f56",
+      "name": "Get Transcript",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Given this transcript, generate the code for an .ass file to add subtitles to a mobile video. Keep the font size at 10. Position the captions at the top 3rd of the video.\n\nReturn only the content of the file. \n\nFormat your answer in JSON like like this:\n{ \"fileContent\": \"<file content here>\" }\n\nHere is the transcript:\n {{ $json.stdout }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "c8f1c90e-5b11-419c-9f09-c0e2e305d8a5",
+      "name": "Create Subtitles",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        -224,
+        240
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "EXOwwjSfNqx4ndc7",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -i  {{ $('Video Values').last().json.videoFolder }}/mobile-full.mp4 -vf \"ass={{ $('Video Values').last().json.videoFolder }}/mobile-full.ass\" -c:a copy {{ $('Video Values').last().json.videoFolder }}/mobile-final.mp4"
+      },
+      "id": "17c2527a-5097-4581-959d-677d896b58cf",
+      "name": "Add Subtitles",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        832,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -i /files/{{ $('Get File Name').item.json.folderName }}.mp4 -ar 16000 -ac 1 -c:a pcm_s16le /files/{{ $('Get File Name').item.json.folderName }}.wav\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        496,
+        -816
+      ],
+      "id": "58a6b3d6-856c-401a-a01d-ee3bf205d100",
+      "name": "ffmpeg mp4 to wav"
+    },
+    {
+      "parameters": {
+        "command": "ls /files"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        -800
+      ],
+      "id": "430f71da-6fc2-4660-b2e1-b638df37b25a",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "52c36838-1d5f-47ae-99d3-081b657f36b2",
+              "leftValue": "={{ $json.stdout }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -448,
+        -800
+      ],
+      "id": "06061fa4-0924-4920-87de-5c9a1db7f53f",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        -800
+      ],
+      "id": "7ca91779-868b-434b-9302-eaca4f787cfc",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get File Name": {
+      "main": [
+        [
+          {
+            "node": "Create Folder for Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Folder for Video": {
+      "main": [
+        [
+          {
+            "node": "Create Clips Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Whisper for Transcript": {
+      "main": [
+        [
+          {
+            "node": "Identify Clips with Timestamps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identify Clips with Timestamps": {
+      "main": [
+        [
+          {
+            "node": "Create ffmpeg cmd for clips",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Clips Folder": {
+      "main": [
+        [
+          {
+            "node": "Create Mobile Clips Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Mobile Clips Folder": {
+      "main": [
+        [
+          {
+            "node": "ffmpeg mp4 to wav",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute ffmpeg cmd": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Video Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ffmpeg 9x16 clip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video Values": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create ffmpeg cmd for clips": {
+      "main": [
+        [
+          {
+            "node": "Execute ffmpeg cmd",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ffmpeg mobile clip": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ffmpeg camera feed clip": {
+      "main": [
+        [
+          {
+            "node": "ffmpeg mobile clip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ffmpeg 9x16 clip": {
+      "main": [
+        [
+          {
+            "node": "ffmpeg camera feed clip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Combine Clips Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk2": {
+      "main": [
+        [
+          {
+            "node": "Add Subtitles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Clips Command": {
+      "main": [
+        [
+          {
+            "node": "Create Short",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Short": {
+      "main": [
+        [
+          {
+            "node": "Get Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Transcript": {
+      "main": [
+        [
+          {
+            "node": "Create Subtitles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Subtitles": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ffmpeg mp4 to wav": {
+      "main": [
+        [
+          {
+            "node": "Run Whisper for Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get File Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d04331e3-1f68-4013-b4e6-6ba960d732c7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "33d3118021c86740b1a15c617d0d9d55d063df19d7374e00a1b8953c3734f20d"
+  },
+  "id": "ZqRDlfAuxR7CyTIg",
+  "tags": []
+}
